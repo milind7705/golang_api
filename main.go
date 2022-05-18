@@ -12,13 +12,22 @@ import (
 
 var err error
 
+// @title                       Sample golang api
+// @version                     pre-release
+// @termsOfService              http://swagger.io/terms/
+// @contact.name                POC project
+// @contact.email               My email
+// @license.name                UNLICENSED
+
 func main() {
-	dsn := "host=localhost user=pg password=pass dbname=crud port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+
+	dsn := "host=database user=pg password=pass dbname=crud port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	config.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println("Status:", err)
 	}
-	config.DB.AutoMigrate(&models.User{})
+	config.DB.AutoMigrate(&models.User{}, &models.Address{}, &models.Company{})
 	r := routes.SetupRouter()
-	r.Run()
+
+	r.Run(":8000")
 }

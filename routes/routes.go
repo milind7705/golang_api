@@ -8,6 +8,7 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
+	r.Use(gin.Recovery())
 	grp1 := r.Group("/user-api")
 	{
 		grp1.GET("user", controller.GetUsers)

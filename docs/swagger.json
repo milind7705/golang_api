@@ -1,0 +1,16 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Sample golang api",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "POC project",
+            "email": "My email"
+        },
+        "license": {
+            "name": "UNLICENSED"
+        },
+        "version": "pre-release"
+    },
+    "paths": {}
+}

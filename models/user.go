@@ -1,8 +1,10 @@
 package models
 
 import (
-	"fmt"
+	"errors"
 	"golang_api/config"
+
+	"gorm.io/gorm"
 )
 
 func GetAllUsers(user *[]User) (err error) {
@@ -27,8 +29,35 @@ func GetUserByID(user *User, id string) (err error) {
 }
 
 func UpdateUser(user *User, id string) (err error) {
-	fmt.Println(user)
-	config.DB.Save(user)
+
+	var existing_user User
+	var address Address
+	var company Company
+	config.DB.Preload("Address").Preload("Company").First(&existing_user, user.ID)
+	if existing_user.Address.City == user.Address.City {
+		user.Address = existing_user.Address
+	} else {
+		err := config.DB.Where("city = ?", user.Address.City).First(&address).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			config.DB.Create(&user.Address)
+			address = user.Address
+		}
+		user.Address = address
+		user.AddressID = address.ID
+
+	}
+	if existing_user.Company.Name == user.Company.Name {
+		user.Company = existing_user.Company
+	} else {
+		err := config.DB.Where("name = ?", user.Company.Name).First(&company).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			config.DB.Create(&user.Company)
+			company = user.Company
+		}
+		user.Company = company
+		user.CompanyID = company.ID
+	}
+	config.DB.Model(&existing_user).Updates(user)
 	return nil
 }
 

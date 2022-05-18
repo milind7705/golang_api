@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"golang_api/models"
 	"net/http"
 
@@ -13,6 +12,7 @@ func GetUsers(c *gin.Context) {
 	err := models.GetAllUsers(&user)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
+		return
 	} else {
 		c.JSON(http.StatusOK, user)
 	}
@@ -25,6 +25,7 @@ func GetUserByID(c *gin.Context) {
 	err := models.GetUserByID(&user, id)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
+		return
 	} else {
 		c.JSON(http.StatusOK, user)
 	}
@@ -32,11 +33,14 @@ func GetUserByID(c *gin.Context) {
 
 func CreateUser(c *gin.Context) {
 	var user models.User
-	c.BindJSON(&user)
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	err := models.CreateUser(&user)
 	if err != nil {
-		fmt.Println(err.Error())
 		c.AbortWithStatus(http.StatusNotFound)
+		return
 	} else {
 		c.JSON(http.StatusOK, user)
 	}
@@ -47,12 +51,17 @@ func UpdateUser(c *gin.Context) {
 	id := c.Params.ByName("id")
 	err := models.GetUserByID(&user, id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, user)
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
 	}
-	c.BindJSON(&user)
+	if err = c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	err = models.UpdateUser(&user, id)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		c.JSON(http.StatusBadRequest, gin.H{"error at update user": err.Error()})
+		return
 	} else {
 		c.JSON(http.StatusOK, user)
 	}
@@ -64,6 +73,7 @@ func DeleteUser(c *gin.Context) {
 	err := models.DeleteUser(&user, id)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
+		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"id" + id: "is deleted"})
 	}

@@ -1,0 +1,11 @@
+info:
+  contact:
+    email: My email
+    name: POC project
+  license:
+    name: UNLICENSED
+  termsOfService: http://swagger.io/terms/
+  title: Sample golang api
+  version: pre-release
+paths: {}
+swagger: "2.0"
